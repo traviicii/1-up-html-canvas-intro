@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animation Basics</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="animationCanvas"></canvas>
+
+    <script>
+        // Set up the canvas and context
+        const canvas = document.getElementById("animationCanvas")
+        const ctx = canvas.getContext('2d')
+
+        // Set up canvas size to match our window size
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        // Update the canvas size if our window is every resized
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+        })
+
+        class Circle {
+
+            constructor(x, y, dx, dy, radius, color) {
+                this.x = x; // x-coordinate
+                this.y = y; // y-coordinate
+                this.dx = dx; // velocity in the x direction (speed and direction on the x-axis)
+                this.dy = dy; // velocity in the y direction (speed and direction on the y-axis)
+                this.radius = radius; 
+                this.color = color
+            }
+
+            // Draw the circle onto the canvas
+            draw() {
+                ctx.beginPath(); // beginning of our brush stroke
+                // ctx.rect(this.x, this.y, this.radius, this.radius)
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2,false)
+                ctx.fillStyle = this.color
+                ctx.fill()
+                ctx.closePath()
+            }
+
+            update() {
+                let gravity = .2
+                // check to see if a circle is hitting the left or right side of our canvas
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                    this.dx = -this.dx // reverse direction on the x-axis
+                }
+
+                // check if circle is hitting top or bottom of our canvas
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+                    this.dy = -this.dy // rever direction on y-axis
+                } 
+                // else {
+                 //   this.dy += gravity
+                //} // add gravity to our physics
+
+
+
+                // Update the circle's position based off of velocity
+                this.x += this.dx
+                this.y += this.dy
+
+                this.draw()
+            }
+
+        }
+
+        const colors = ['#F2D092', '#F28795', '#F25C95', '#BF1394', '#0D0D9D']
+
+        function randomColor(color) {
+            return colors[Math.floor(Math.random() * colors.length)]
+        }
+
+
+        // create an array to hold onto all of our circles
+        let circles = []
+
+        // create circles using a for loop
+        for (let i = 0; i < 90; i++) {
+            let radius = (Math.random() * 40) + 5 // 30
+            let x = Math.random() * (canvas.width - radius * 2) + radius // Generating a random x value for our circles to start at
+            let y = Math.random() * (canvas.height - radius * 2) + radius // Generating a random y value for our circles to start at
+            let dx = (Math.random() - 0.5) * 4 // Generate a random number for our velocity
+            let dy = (Math.random() - 0.5) * 4
+            let color = randomColor(colors) // 'red'
+            circles.push(new Circle(x, y, dx, dy, radius, color))
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate); // looping the animation
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the entire canvas to avoid leaving trails
+
+            // update each circle and redraw
+            circles.forEach(circle => circle.update()) // looping through each circle and updating each circle's position on screen
+        }
+
+        // start out animation
+        animate();
+
+    </script>
+    
+</body>
+</html>
